@@ -1,4 +1,3 @@
-
 const express = require('express');
 const morgan = require('morgan');
 
@@ -10,8 +9,6 @@ const app = express();
 
 app.use(morgan('dev'));
 app.use(express.json());
-
-const port = 3000;
 
 app.use((req, res, next) => {
    req.requestedTime = new Date().toISOString();
@@ -27,6 +24,4 @@ app.post('/test', (req, res)=> {
     res.send('You can post to this endpoint');
 });
 
-app.listen(port, () => {
-    console.log(`App running on port ${port}`);
-})
+module.exports = app;
