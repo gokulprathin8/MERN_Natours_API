@@ -4,6 +4,27 @@ const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/../data.json`)
 );
 
+exports.checkID = (req, res, next, val) => {
+    if (req.params.id * 1> tours.length) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        })
+    }
+    next();
+}
+
+exports.checkPostMiddleware = (req, res, next) => {
+    if (!req.body.name || !req.body.price) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'BAD REQUEST'
+        })
+    }
+    next();
+}
+
+
 exports.getAllTours = (req, res) => {
     res.status(200).json({
         status: 'success',
