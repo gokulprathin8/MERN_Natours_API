@@ -10,8 +10,8 @@ mongoose.connect(process.env.DATABASE, {
     useCreateIndex: true,
     useFindAndModify: false
 }).then((conn) => {
-    console.log(conn.connections);
-})
+    // console.log(conn.connections);
+});
 
 app.listen(port, () => {
     console.log(`App running on port ${port}`);
