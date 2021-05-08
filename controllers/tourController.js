@@ -12,10 +12,11 @@ class APIFeatures {
     constructor(query, queryString) {
         this.query = query;
         this.queryString  = queryString;
+
     }
 
     filter() {
-        const queryObject = {...req.query};
+        const queryObject = {...this.queryString};
         const excludeFields = ['page', 'sort', 'limit', 'fields'];
         excludeFields.forEach(element => delete queryObject[element]);
 
@@ -28,10 +29,10 @@ class APIFeatures {
 
     sort() {
         if (this.queryString.sort) {
-            const sortBy = req.query.sort.split(',').join(' ')
-            this.query = query.sort(sortBy);
+            const sortBy = this.queryString.sort.split(',').join(' ')
+            this.query = this.query.sort(sortBy);
         } else {
-            this.query = query.sort('-createdAt');
+            this.query = this.query.sort('-createdAt');
         }
         return this;
     }
@@ -58,7 +59,6 @@ class APIFeatures {
 
 exports.getAllTours = async (req, res) => {
     try {
-
         const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().pagination();
         const tours = await features.query;
 
