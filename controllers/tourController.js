@@ -154,13 +154,20 @@ exports.getTourStats = async (req, res) => {
             },
             {
                 $group: {
-                    _id: null,
+                    _id: { $toUpper: '$name' },
+                    sumDurations: { $sum: '$durations' },
                     avgRating: { $avg: '$ratingsAverage' },
                     avgPrice: { $avg: '$price' },
                     minPrice: { $min: '$price' },
                     maxPrice: { $max: '$price' }
                 }
-            }
+            },
+            {
+                $sort: { avgPrice: 1 }
+            },
+            // {
+            //     $match: { _id: { $ne: 'THE SEA EXPLORER 2' } }
+            // }
         ]);
 
         res.status(200).json({
