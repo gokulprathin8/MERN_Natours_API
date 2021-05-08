@@ -8,7 +8,8 @@ const port = process.env.PORT ||  3000;
 mongoose.connect(process.env.DATABASE, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    useUnifiedTopology: true
 }).then((conn) => {
     // console.log(conn.connections);
 });

@@ -25,6 +25,7 @@
     "mongoose": "^5.12.7",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.7",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "slugify": "^1.5.2"
   }
 }
