@@ -27,14 +27,14 @@ app.get('/test', testRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
-app.all('*', (req, res) => {
+app.all('*', (req, res, next) => {
     // res.status(404).json({
     //     status: 'fail',
     //     message: `The endpoint ${req.originalUrl} is not defined. If you believe this is wrong. Please contact system administrator.`
     // });
 
     const error = new Error(`The endpoint ${req.originalUrl} is not defined. If you believe this is wrong. Please contact system administrator.`);
-    eror.status = 'fail';
+    error.status = 'fail';
     error.statusCode = 404;
 
     next(error);
