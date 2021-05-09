@@ -1,5 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -28,26 +30,13 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
 app.all('*', (req, res, next) => {
-    // res.status(404).json({
-    //     status: 'fail',
-    //     message: `The endpoint ${req.originalUrl} is not defined. If you believe this is wrong. Please contact system administrator.`
-    // });
+    // const error = new Error(`The endpoint ${req.originalUrl} is not defined. If you believe this is wrong. Please contact system administrator.`);
+    // error.status = 'fail';
+    // error.statusCode = 404;
 
-    const error = new Error(`The endpoint ${req.originalUrl} is not defined. If you believe this is wrong. Please contact system administrator.`);
-    error.status = 'fail';
-    error.statusCode = 404;
-
-    next(error);
+    next(new AppError(`The endpoint ${req.originalUrl} is not defined. If you believe this is wrong. Please contact system administrator.`, 404));
 });
 
-app.use((err, req, res, next) => {
-    err.statusCode = err.statusCode || 500;
-    err.status = err.status || 'error';
-
-    res.status(err.statusCode).json({
-        status: err.status,
-        message: err.message
-    })
-});
+app.use(globalErrorHandler);
 
 module.exports = app;
