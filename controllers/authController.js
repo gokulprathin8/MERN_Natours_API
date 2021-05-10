@@ -1,7 +1,9 @@
-const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
 const User = require('../models/userModel');
+const sendEmail = require('../utils/email');
 const AppError = require('../utils/appError');
+
 const catchAsync = require('../utils/catchAsync');
 
 const signToken = (id) => {
@@ -83,4 +85,38 @@ exports.restrictTo = (...roles) => {
         }
         next();
     }
+}
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+        return next(new AppError('There is no user with the specified email address', 404));
+    }
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+
+    const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+    const message = `Forgot your Password? Submit a PATCH request with your new password and password Confirm to ${resetURL}.\n If you didn't forget your password, please ignore this message`;
+
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: "Natours Password Reset - Valid Only for 10 minutes",
+            message: message
+        });
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Token sent to email!'
+        });
+    } catch (err) {
+        user.passwordResetToken = undefined;
+        user.passwordResetExpiration = undefined;
+        await user.save({ validateBeforeSave: false });
+        return next(new AppError('There was an error sending the email. Please try later!'), 500)
+    }
+});
+
+exports.resetPassword = (req, res, next) => {
+
 }
