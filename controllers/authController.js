@@ -13,7 +13,20 @@ const signToken = (id) => {
     })
 }
 
+const createSendToken = (user, statusCode, res) => {
+    const token = signToken(user._id);
+
+    res.status(statusCode).json({
+        status: 'success',
+        token: token,
+        data: {
+            user: user
+        }
+    });
+}
+
 exports.signUp = catchAsync(async (req, res) => {
+
     const user = await User.create({
         name: req.body.name,
         email: req.body.email,
@@ -22,15 +35,7 @@ exports.signUp = catchAsync(async (req, res) => {
         confirmPassword: req.body.confirmPassword
     });
 
-    const token = signToken(user._id);
-
-    res.status(201).json({
-        status: 'success',
-        data: {
-            user: user,
-            token: token
-        }
-    });
+    createSendToken(user, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -46,13 +51,7 @@ exports.login = catchAsync(async (req, res, next) => {
         return next(new AppError('Incorrect email or password', 401));
     }
 
-    const token = signToken(user._id);
-    res.status(200).json({
-        status: 'success',
-        data: {
-            token: token
-        }
-    })
+    createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -129,10 +128,19 @@ exports.resetPassword = catchAsync(async  (req, res, next) => {
     user.passwordResetExpires = undefined;
     await user.save();
 
-    const token = signToken(user._id);
-    res.status(200).json({
-        status: 'success',
-        token: token
-    })
+    createSendToken(user, 200, res);
 });
 
+exports.updatePassword = catchAsync( async (req, res, next) => {
+
+    const user = await User.findById(req.user.id).select('+password');
+
+    if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+        return next(new AppError(`Your current password is wrong`, 401));
+    }
+    user.password = req.body.password;
+    user.confirmPassword = req.body.passwordConfirm;
+    await user.save();
+
+    createSendToken(user, 200, res);
+})
