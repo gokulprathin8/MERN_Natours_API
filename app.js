@@ -1,3 +1,4 @@
+const hpp = require('hpp');
 const cors = require('cors');
 const helmet = require('helmet');
 const xss = require('xss-clean');
@@ -12,6 +13,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const testRouter = require('./routes/testRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
 
@@ -25,6 +27,7 @@ const limiter = rateLimit({
     message: 'Too many requests from this IP, please try in an hour!'
 });
 
+
 app.use(xss());
 app.use(cors());
 app.use(helmet());
@@ -35,6 +38,17 @@ app.use(express.static(`${__dirname}/public`))
 // Sanitize Data
 app.use(mongoSanitize());
 
+// Remove Parameter Pollution
+app.use(hpp( {
+    whitelist: [
+        'duration',
+        'ratingsQuantity',
+        'ratingsAverage',
+        'maxGroupSize',
+        'difficulty',
+        'price'
+    ]
+}));
 
 app.use((req, res, next) => {
    req.requestedTime = new Date().toISOString();
@@ -48,6 +62,7 @@ app.post('/test', (req, res)=> {
 app.get('/test', testRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 app.all('*', (req, res, next) => {
     // const error = new Error(`The endpoint ${req.originalUrl} is not defined. If you believe this is wrong. Please contact system administrator.`);
