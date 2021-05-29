@@ -24,9 +24,13 @@ const reviewSchema = new mongoose.Schema({
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 reviewSchema.pre(/^find/, function(next) {
+    // this.populate({
+    //     path: 'tour_id',
+    // }).populate({
+    //     path: 'user_id',
+    // });
+
     this.populate({
-        path: 'tour_id',
-    }).populate({
         path: 'user_id',
     });
     next();

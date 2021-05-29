@@ -79,7 +79,7 @@ exports.getAllTours = async (req, res) => {
 
 exports.getTourById = async (req, res) => {
     try {
-        const tour = await Tour.findById(req.params.id);
+        const tour = await Tour.findById(req.params.id).populate('review');
         res.status(201).json({
             status: 'success',
             data: {

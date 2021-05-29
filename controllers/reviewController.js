@@ -14,7 +14,13 @@ exports.getAllReviews = catchAsync(async (req, res) => {
 });
 
 exports.createReview = catchAsync(async (req, res) => {
-    req.body.user_id = req.user._id;
+    if (!req.body.tour) {
+        req.body.tour = req.params.tourId;
+    }
+    if (!req.body.user) {
+        req.body.user_id = req.user._id;
+    }
+
     const newReview = await Review.create(req.body);
     newReview.__v = undefined;
     res.status(201).json({

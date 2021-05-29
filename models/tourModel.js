@@ -116,6 +116,13 @@ tourSchema.virtual('durationWeeks').get(function() {
     return this.durations / 7;
 });
 
+// Virtual Populate
+tourSchema.virtual('review', {
+    ref: 'Review',
+    foreignField: 'tour_id',
+    localField: '_id'
+});
+
 tourSchema.pre('save', function (next) {
     this.slug = slugify(this.name, { lower: true });
     this.start = Date.now();
