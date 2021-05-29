@@ -29,4 +29,4 @@ exports.createReview = catchAsync(async (req, res) => {
             review: newReview
         }
     });
-})
+});
